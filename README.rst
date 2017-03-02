@@ -30,8 +30,14 @@ For more on using the tool, just run `calima -h`.
 
 Documentation
 -------------
-There is currently no documentation yet, check the Calima.py file to
-see available functions.
+A good readup introductory readup on BLE reverse engineering can be found
+`here <https://medium.com/@urish/reverse-engineering-a-bluetooth-lightbulb-56580fcb7546#.9ltnsvdsn>`_.
+
+Some badly structured details about the protocol can be found in the
+`Characteristics file <characteristics.md>`_.
+
+There is currently no documentation on the module yet, check the
+Calima.py file to see available functions.
 
 License
 -------
