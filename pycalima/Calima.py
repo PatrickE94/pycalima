@@ -71,6 +71,14 @@ class Calima:
 
         self.conn.writeCharacteristic(handle, val, withResponse=True)
 
+    def scanCharacteristics(self):
+        val = self.conn.getCharacteristics()
+        for ch in val:
+            if (ch.supportsRead()):
+                print("[%s] %s = %s" % (hex(ch.getHandle()), ch.propertiesToString(), self._bToStr(ch.read())))
+            else:   
+                print("[%s] %s" % (hex(ch.getHandle()), ch.propertiesToString()))
+
     # --- Generic GATT Characteristics
 
     def getDeviceName(self):

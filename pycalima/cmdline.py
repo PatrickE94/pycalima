@@ -28,6 +28,7 @@ def printHelp():
     print("-l\tScan and list all found Calimas")
     print("-m\tSpecify Calima MAC address")
     print("-p\tSpecify Calima Pincode")
+    print("-s\tScan all characteristics")
 
 def main():
     try:
@@ -50,40 +51,45 @@ def main():
             mac_address = arg
         elif opt in ("-p", "--pin"):
             pincode = arg
+        elif opt in ("-s", "--scan"):
+            action = "scan"
 
     if pincode == "" or mac_address == "":
         print("You need to set both mac address and pincode to connect\n")
         sys.exit(2)
 
     fan = Calima(mac_address, pincode)
+    if action == "scan":
+        fan.scanCharacteristics()
+        fan.disconnect()
+    else:
+        print("Device Name: ", fan.getDeviceName())
+        print("Model Number: ", fan.getModelNumber())
+        print("Serial Number: ", fan.getSerialNumber())
+        print("Hardware Revision: ", fan.getHardwareRevision())
+        print("Firmware Revision: ", fan.getFirmwareRevision())
+        print("Software Revision: ", fan.getSoftwareRevision())
+        print("Manufacturer: ", fan.getManufacturer())
+        print("Alias: ", fan.getAlias())
+        print("Unknown 1f: ", fan.getUnknown1f())
+        print("Unknown 24: ", fan.getUnknown24())
+        print("Unknown 26: ", fan.getUnknown26())
+        print("Fan Speed Settings: ", fan.getFanSpeedSettings())
+        print("Sensors Sensitivity: ", fan.getSensorsSensitivity())
+        print("Light Sensor Settings: ", fan.getLightSensorSettings())
+        print("Unknown 2e: ", fan.getUnknown2e())
+        print("Boost Mode: ", fan.getBoostMode())
+        print("Unknown 32: ", fan.getUnknown32())
+        print("Automatic Cycles: ", fan.getAutomaticCycles())
+        print("Time: ", fan.getTime())
+        print("Silent Hours: ", fan.getSilentHours())
+        print("Trickle Days: ", fan.getTrickleDays())
 
-    print("Device Name: ", fan.getDeviceName())
-    print("Model Number: ", fan.getModelNumber())
-    print("Serial Number: ", fan.getSerialNumber())
-    print("Hardware Revision: ", fan.getHardwareRevision())
-    print("Firmware Revision: ", fan.getFirmwareRevision())
-    print("Software Revision: ", fan.getSoftwareRevision())
-    print("Manufacturer: ", fan.getManufacturer())
-    print("Alias: ", fan.getAlias())
-    print("Unknown 1f: ", fan.getUnknown1f())
-    print("Unknown 24: ", fan.getUnknown24())
-    print("Unknown 26: ", fan.getUnknown26())
-    print("Fan Speed Settings: ", fan.getFanSpeedSettings())
-    print("Sensors Sensitivity: ", fan.getSensorsSensitivity())
-    print("Light Sensor Settings: ", fan.getLightSensorSettings())
-    print("Unknown 2e: ", fan.getUnknown2e())
-    print("Boost Mode: ", fan.getBoostMode())
-    print("Unknown 32: ", fan.getUnknown32())
-    print("Automatic Cycles: ", fan.getAutomaticCycles())
-    print("Time: ", fan.getTime())
-    print("Silent Hours: ", fan.getSilentHours())
-    print("Trickle Days: ", fan.getTrickleDays())
-
-    while True:
-        try:
-            print(fan.getState())
-            time.sleep(2)
-        except Exception as e:
-            print(e)
-            fan.disconnect()
-            break
+        while True:
+            try:
+                print(fan.getState())
+                time.sleep(2)
+            except Exception as e:
+                print(e)
+                fan.disconnect()
+                break
