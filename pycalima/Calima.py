@@ -100,10 +100,10 @@ class Calima:
         self._writeHandle(0x18, pack("<I", int(pin)))
 
     def setAlias(self, name):
-        self._writeHandle(0x1c, pack('20s', bytearray(name, 'ascii')))
+        self._writeHandle(0x1c, pack('20s', bytearray(name, 'utf-8')))
 
     def getAlias(self):
-        return self._readHandle(0x1c).decode('ascii')
+        return self._readHandle(0x1c).decode('utf-8')
 
     def getUnknown1f(self):
         return self._bToStr(self._readHandle(0x1f))
