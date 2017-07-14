@@ -75,9 +75,10 @@ class Calima:
         val = self.conn.getCharacteristics()
         for ch in val:
             if (ch.supportsRead()):
-                print("[%s] %s = %s" % (hex(ch.getHandle()), ch.propertiesToString(), self._bToStr(ch.read())))
-            else:   
-                print("[%s] %s" % (hex(ch.getHandle()), ch.propertiesToString()))
+                rd = ch.read()
+                print("[%s] %s (%s) = (%d) %s" % (hex(ch.getHandle()), ch.uuid.getCommonName(), ch.propertiesToString(), len(rd), self._bToStr(rd)))
+            else:
+                print("[%s] %s (%s)" % (hex(ch.getHandle()), ch.uuid.getCommonName(), ch.propertiesToString()))
 
     # --- Generic GATT Characteristics
 
