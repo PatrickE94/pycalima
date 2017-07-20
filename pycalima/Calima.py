@@ -58,18 +58,25 @@ class Calima:
     def _bToStr(self, val):
         return binascii.b2a_hex(val).decode('utf-8')
 
+    def _readUUID(self, uuid):
+        val = self.conn.getCharacteristics(uuid=uuid)[0].read()
+        if (self._debug):
+            print("[Calima] [R] %s = %s" % (uuid, self._bToStr(val)))
+
+        return val
+
+    def _writeUUID(self, uuid, val):
+        if (self._debug):
+            print("[Calima] [W] %s = %s" % (uuid, self._bToStr(val)))
+
+        self.conn.getCharacteristics(uuid=uuid)[0].write(val)
+
     def _readHandle(self, handle):
         val = self.conn.readCharacteristic(handle)
         if (self._debug):
             print("[Calima] [R] %s = %s" % (hex(handle), self._bToStr(val)))
 
         return val
-
-    def _writeHandle(self, handle, val):
-        if (self._debug):
-            print("[Calima] [W] %s = %s" % (hex(handle), self._bToStr(val)))
-
-        self.conn.writeCharacteristic(handle, val, withResponse=True)
 
     def scanCharacteristics(self):
         val = self.conn.getCharacteristics()
@@ -106,29 +113,29 @@ class Calima:
     # --- Onwards to PAX "unknown" characteristics
 
     def setAuth(self, pin):
-        self._writeHandle(0x18, pack("<I", int(pin)))
+        self._writeUUID("4cad343a-209a-40b7-b911-4d9b3df569b2", pack("<I", int(pin)))
 
     def setAlias(self, name):
-        self._writeHandle(0x1c, pack('20s', bytearray(name, 'utf-8')))
+        self._writeUUID("b85fa07a-9382-4838-871c-81d045dcc2ff", pack('20s', bytearray(name, 'utf-8')))
 
     def getAlias(self):
-        return self._readHandle(0x1c).decode('utf-8')
+        return self._readUUID("b85fa07a-9382-4838-871c-81d045dcc2ff").decode('utf-8')
 
     def getUnknown1f(self):
-        return self._bToStr(self._readHandle(0x1f))
+        return self._bToStr(self._readUUID("25a824ad-3021-4de9-9f2f-60cf8d17bded"))
 
     def getState(self):
-        v = unpack('<4HBHB', self._readHandle(0x21))
+        v = unpack('<4HBHB', self._readUUID("528b80e8-c47a-4c0a-bdf1-916a7748f412 "))
         boostMode = bool(v[4] & 0x10)
         #mode = ('Unknown', 'Trickle', 'Light', 'Humidity')[v[4] & ~(0x10)]
         mode = v[4] >> 1
         return FanState(v[0], v[1]/4, v[2], v[3], boostMode, mode, v[5], v[6])
 
     def getUnknown24(self):
-        return self._bToStr(self._readHandle(0x24))
+        return self._bToStr(self._readUUID("63b04af9-24c0-4e5d-a69c-94eb9c5707b4"))
 
     def getUnknown26(self):
-        return self._bToStr(self._readHandle(0x26))
+        return self._bToStr(self._readUUID("90cabcd1-bcda-4167-85d8-16dcd8ab6a6b "))
 
     def setFanSpeedSettings(self, humidity=2250, light=1625, trickle=1000):
         for val in (humidity, light, trickle):
@@ -137,10 +144,10 @@ class Calima:
             if (val > 2500 or val < 0):
                 raise ValueError("Speeds must be between 0 and 2500 rpm")
 
-        self._writeHandle(0x28, pack('<HHH', humidity, light, trickle))
+        self._writeUUID("1488a757-35bc-4ec8-9a6b-9ecf1502778e", pack('<HHH', humidity, light, trickle))
 
     def getFanSpeedSettings(self):
-        return Fanspeeds._make(unpack('<HHH', self._readHandle(0x28)))
+        return Fanspeeds._make(unpack('<HHH', self._readUUID("1488a757-35bc-4ec8-9a6b-9ecf1502778e")))
 
     def setSensorsSensitivity(self, humidity, light):
         if humidity > 3 or humidity < 0:
@@ -149,10 +156,10 @@ class Calima:
             raise ValueError("Light sensitivity must be between 0-3")
 
         value = pack('<4B', bool(humidity), humidity, bool(light), light)
-        self._writeHandle(0x2a, value)
+        self._writeUUID("e782e131-6ce1-4191-a8db-f4304d7610f1 ", value)
 
     def getSensorsSensitivity(self):
-        return Sensitivity._make(unpack('<4B', self._readHandle(0x2a)))
+        return Sensitivity._make(unpack('<4B', self._readUUID("e782e131-6ce1-4191-a8db-f4304d7610f1 ")))
 
     def setLightSensorSettings(self, delayed, running):
         if delayed not in (0, 5, 10):
@@ -160,13 +167,13 @@ class Calima:
         if running not in (5, 10, 15, 30, 60):
             raise ValueError("Running time must be 5, 10, 15, 30 or 60 minutes")
 
-        self._writeHandle(0x2c, pack('<2B', delayed, running))
+        self._writeUUID("49c616de-02b1-4b67-b237-90f66793a6f2", pack('<2B', delayed, running))
 
     def getLightSensorSettings(self):
-        return LightSensorSettings._make(unpack('<2B', self._readHandle(0x2c)))
+        return LightSensorSettings._make(unpack('<2B', self._readUUID("49c616de-02b1-4b67-b237-90f66793a6f2")))
 
     def getUnknown2e(self):
-        return self._bToStr(self._readHandle(0x2e))
+        return self._bToStr(self._readUUID("a22eae12-dba8-49f3-9c69-1721dcff1d96"))
 
     def setBoostMode(self, on, speed, seconds):
         if speed % 25:
@@ -175,28 +182,28 @@ class Calima:
             speed = 0
             seconds = 0
 
-        self._writeHandle(0x30, pack('<BHH', on, speed, seconds))
+        self._writeUUID("118c949c-28c8-4139-b0b3-36657fd055a9", pack('<BHH', on, speed, seconds))
 
     def getBoostMode(self):
-        return BoostMode._make(unpack('<BHH', self._readHandle(0x30)))
+        return BoostMode._make(unpack('<BHH', self._readUUID("118c949c-28c8-4139-b0b3-36657fd055a9")))
 
     def getUnknown32(self):
-        return self._bToStr(self._readHandle(0x32))
+        return self._bToStr(self._readUUID("8b850c04-dc18-44d2-9501-7662d65ba36e"))
 
     def setAutomaticCycles(self, setting):
         if setting < 0 or setting > 3:
             raise ValueError("Setting must be between 0-3")
 
-        self._writeHandle(0x34, pack('<B', setting))
+        self._writeUUID("f508408a-508b-41c6-aa57-61d1fd0d5c39", pack('<B', setting))
 
     def getAutomaticCycles(self):
-        return unpack('<B', self._readHandle(0x34))[0]
+        return unpack('<B', self._readUUID("f508408a-508b-41c6-aa57-61d1fd0d5c39"))[0]
 
     def setTime(self, dayofweek, hour, minute, second):
-        self._writeHandle(0x36, pack('<4B', dayofweek, hour, minute, second))
+        self._writeUUID("6dec478e-ae0b-4186-9d82-13dda03c0682", pack('<4B', dayofweek, hour, minute, second))
 
     def getTime(self):
-        return Time._make(unpack('<BBBB', self._readHandle(0x36)))
+        return Time._make(unpack('<BBBB', self._readUUID("6dec478e-ae0b-4186-9d82-13dda03c0682")))
 
     def setTimeToNow(self):
         now = datetime.datetime.now()
@@ -215,13 +222,16 @@ class Calima:
         value = pack('<5B', int(on),
                      startingHour, startingMinute,
                      endingHour, endingMinute)
-        self._writeHandle(0x38, value)
+        self._writeUUID("b5836b55-57bd-433e-8480-46e4993c5ac0", value)
 
     def getSilentHours(self):
-        return SilentHours._make(unpack('<5B', self._readHandle(0x38)))
+        return SilentHours._make(unpack('<5B', self._readUUID("b5836b55-57bd-433e-8480-46e4993c5ac0")))
 
     def setTrickleDays(self, weekdays, weekends):
-        self._writeHandle(0x3a, pack('<2B', weekdays, weekends))
+        self._writeUUID("faa49e09-a79c-4725-b197-bdc57c67dc32", pack('<2B', weekdays, weekends))
 
     def getTrickleDays(self):
-        return TrickleDays._make(unpack('<2B', self._readHandle(0x3a)))
+        return TrickleDays._make(unpack('<2B', self._readUUID("faa49e09-a79c-4725-b197-bdc57c67dc32")))
+
+    def getUnknown3c(self):
+        return self._readUUID("ff5f7c4f-2606-4c69-b360-15aaea58ad5f")
