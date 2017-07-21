@@ -125,7 +125,7 @@ class Calima:
         return self._bToStr(self._readUUID("25a824ad-3021-4de9-9f2f-60cf8d17bded"))
 
     def getState(self):
-        v = unpack('<4HBHB', self._readUUID("528b80e8-c47a-4c0a-bdf1-916a7748f412 "))
+        v = unpack('<4HBHB', self._readUUID("528b80e8-c47a-4c0a-bdf1-916a7748f412"))
         boostMode = bool(v[4] & 0x10)
         #mode = ('Unknown', 'Trickle', 'Light', 'Humidity')[v[4] & ~(0x10)]
         mode = v[4] >> 1
@@ -135,7 +135,7 @@ class Calima:
         return self._bToStr(self._readUUID("63b04af9-24c0-4e5d-a69c-94eb9c5707b4"))
 
     def getUnknown26(self):
-        return self._bToStr(self._readUUID("90cabcd1-bcda-4167-85d8-16dcd8ab6a6b "))
+        return self._bToStr(self._readUUID("90cabcd1-bcda-4167-85d8-16dcd8ab6a6b"))
 
     def setFanSpeedSettings(self, humidity=2250, light=1625, trickle=1000):
         for val in (humidity, light, trickle):
@@ -156,10 +156,10 @@ class Calima:
             raise ValueError("Light sensitivity must be between 0-3")
 
         value = pack('<4B', bool(humidity), humidity, bool(light), light)
-        self._writeUUID("e782e131-6ce1-4191-a8db-f4304d7610f1 ", value)
+        self._writeUUID("e782e131-6ce1-4191-a8db-f4304d7610f1", value)
 
     def getSensorsSensitivity(self):
-        return Sensitivity._make(unpack('<4B', self._readUUID("e782e131-6ce1-4191-a8db-f4304d7610f1 ")))
+        return Sensitivity._make(unpack('<4B', self._readUUID("e782e131-6ce1-4191-a8db-f4304d7610f1")))
 
     def setLightSensorSettings(self, delayed, running):
         if delayed not in (0, 5, 10):
