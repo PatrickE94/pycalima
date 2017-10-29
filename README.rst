@@ -11,6 +11,16 @@ authentication so values are actually persisted within the fan.
 
 Uses `BluePy <https://github.com/IanHarvey/bluepy>`_
 
+
+Installation
+I did this on Raspberry pi Zero W but it can be done on other hardware too.
+
+You will need to install python3 which is Python v 3.4 if you install it from apt-get repos.
+apt install python3 python3-pip libglib2.0-dev
+
+Then install
+
+
 Demo usage
 ----------
 .. code:: python
