@@ -34,7 +34,7 @@ TrickleDays = namedtuple('TrickleDays', 'Weekdays Weekends')
 BoostMode = namedtuple('BoostMode', 'OnOff Speed Seconds')
 
 FanState = namedtuple('FanState', 'Humidity Temp Light RPM BoostActive Mode Unknown Unknown2')
-FanStateShort = namedtuple('DATEHERE', 'Humidity Temp Light RPM BoostActive Mode')
+FanStateShort = namedtuple('FanState', 'Humidity Temp Light RPM BoostActive Mode')
 
 
 def FindCalimas():
@@ -136,8 +136,9 @@ class Calima:
         v = unpack('<4HBHB', self._readHandle(0x21))
         boostMode = bool(v[4] & 0x10)
         mode = v[4] >> 1
-        #return FanStateShort(v[0], v[1]/4, v[2], v[3], boostMode, mode)
+        #return self._bToStr(self._readHandleShort(0x21))
         return FanStateShort(v[0], v[1]/4, v[2], v[3], boostMode, mode)
+        #return (v[0], v[1]/4, v[2], v[3], boostMode, mode)
 
     def getState(self):
         v = unpack('<4HBHB', self._readHandle(0x21))
