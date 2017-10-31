@@ -44,6 +44,12 @@ also search for available fans if you don't the MAC address.
 
 For more on using the tool, just run `calima -h`.
 
+Debugging
+-------------
+Set this to True in pycalima/Calima.py file if want to see more verbose output.
+
+  self._debug = False
+
 Documentation
 -------------
 A good readup introductory readup on BLE reverse engineering can be found
