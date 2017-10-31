@@ -166,7 +166,6 @@ The last two bytes are complete unknown for now.
 ### Unknown Characteristics
 Below are a few undecoded characteristics with their recorded values.
 ```
-0x001f = 00
 0x0024 = 01
 0x0026 = 00
 0x002e = 19:00:00:34:08
