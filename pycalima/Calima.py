@@ -58,12 +58,25 @@ class Calima:
     def _bToStr(self, val):
         return binascii.b2a_hex(val).decode('utf-8')
 
+    def _readHandleShort(self, handle):
+        val = self.conn.readCharacteristic(handle)
+        if (self._debug):
+            print("%s" % (self._bToStr(val)))
+
+        return val
+
     def _readHandle(self, handle):
         val = self.conn.readCharacteristic(handle)
         if (self._debug):
             print("[Calima] [R] %s = %s" % (hex(handle), self._bToStr(val)))
 
         return val
+
+    def _writeHandleShort(self, handle, val):
+        if (self._debug):
+            print("%s" % (self._bToStr(val)))
+
+        self.conn.writeCharacteristic(handle, val, withResponse=True)
 
     def _writeHandle(self, handle, val):
         if (self._debug):
@@ -114,8 +127,8 @@ class Calima:
     def getAlias(self):
         return self._readHandle(0x1c).decode('utf-8')
 
-    def getUnknown1f(self):
-        return self._bToStr(self._readHandle(0x1f))
+    def getIsClockSet(self):
+        return self._bToStr(self._readHandleShort(0x1f))
 
     def getState(self):
         v = unpack('<4HBHB', self._readHandle(0x21))
@@ -145,7 +158,8 @@ class Calima:
     def setSensorsSensitivity(self, humidity, light):
         if humidity > 3 or humidity < 0:
             raise ValueError("Humidity sensitivity must be between 0-3")
-        if light > 3 or light < 2:
+        if light > 3 or light < 0:
+            print("HELLO")
             raise ValueError("Light sensitivity must be between 0-3")
 
         value = pack('<4B', bool(humidity), humidity, bool(light), light)
@@ -203,18 +217,18 @@ class Calima:
         self.setTime(now.isoweekday(), now.hour, now.minute, now.second)
 
     def setSilentHours(self, on, startingHours, startingMinutes, endingHours, endingMinutes):
-        if startingHour < 0 or startingHour > 23:
+        if startingHours < 0 or startingHours > 23:
             raise ValueError("Starting hour is an invalid number")
-        if endingHour < 0 or endingHours > 23:
+        if endingHours < 0 or endingHours > 23:
             raise ValueError("Ending hour is an invalid number")
-        if startingMinute < 0 or startingMinutes > 59:
+        if startingMinutes < 0 or startingMinutes > 59:
             raise ValueError("Starting minute is an invalid number")
-        if endingMinute < 0 or endingMinute > 59:
+        if endingMinutes < 0 or endingMinutes > 59:
             raise ValueError("Ending minute is an invalid number")
 
         value = pack('<5B', int(on),
-                     startingHour, startingMinute,
-                     endingHour, endingMinute)
+                     startingHours, startingMinutes,
+                     endingHours, endingMinutes)
         self._writeHandle(0x38, value)
 
     def getSilentHours(self):
