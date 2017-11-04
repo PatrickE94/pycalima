@@ -37,7 +37,7 @@ try:
   if fan.getIsClockSet() == "02":
     # Lets preconfigure Calima by setting these values
 
-    # Set appliedSettings to True if we are going to apply the settings
+    # Set appliedSettings to 1 since we are applying the settings
     # We then output its value at the bottom so we know if there was a power cycle
     appliedSettings = 1
   
