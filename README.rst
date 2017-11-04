@@ -22,10 +22,7 @@ You will need to install python3 which is Python v 3.4 if you install it from ap
 Then install BluePy
     $sudo pip3 install bluepy
 
-Clone this repo
-Edit all py files and change the env from python3.6 or 3.7 to just python3
-setup.py install
-
+Clone this repo and then user run.py script to set the basic settings for your Calima. They will be applied if Calima was power cycled. Afterwards it will just poll Calima and output the data. You can pipe it to your home autmation scripts or or cronjob it to a file. 
 
 Demo usage
 ----------
@@ -36,7 +33,7 @@ Demo usage
   fan = Calima("MA:CC:AD:DR:ES:SS", "012345")
   print(fan.getAlias())
 
-Command line tool
+Command line tool - NOTE THE FORKED cmdline tool RIGHT NOW IS NOT FULLY WORKING
 -----------------
 The module includes a very simple commandline tool which prints all
 the characteristics of a fan and then the State every two seonds. It can
