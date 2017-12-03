@@ -33,11 +33,11 @@ Demo usage
   fan = Calima("MA:CC:AD:DR:ES:SS", "012345")
   print(fan.getAlias())
 
-Command line tool - NOTE THE FORKED cmdline tool RIGHT NOW IS NOT FULLY WORKING
+Command line tool
 -----------------
-The module includes a very simple commandline tool which prints all
-the characteristics of a fan and then the State every two seonds. It can
-also search for available fans if you don't the MAC address.
+Pretty useful commnd line tool which among other things can print all
+the characteristics of a fan. It can also search for available fans 
+if you don't the MAC address.
 
 For more on using the tool, just run `calima -h`.
 
