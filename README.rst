@@ -11,6 +11,19 @@ authentication so values are actually persisted within the fan.
 
 Uses `BluePy <https://github.com/IanHarvey/bluepy>`_
 
+
+Installation
+----------
+I did this on Raspberry pi Zero W but it can be done on other hardware too.
+
+You will need to install python3 which is Python v 3.4 if you install it from apt-get repos.
+   $apt install python3 python3-pip libglib2.0-dev
+
+Then install BluePy
+    $sudo pip3 install bluepy
+
+Clone this repo and then user run.py script to set the basic settings for your Calima. They will be applied if Calima was power cycled. Afterwards it will just poll Calima and output the data. You can pipe it to your home autmation scripts or or cronjob it to a file. 
+
 Demo usage
 ----------
 .. code:: python
@@ -22,11 +35,17 @@ Demo usage
 
 Command line tool
 -----------------
-The module includes a very simple commandline tool which prints all
-the characteristics of a fan and then the State every two seonds. It can
-also search for available fans if you don't the MAC address.
+Pretty useful commnd line tool which among other things can print all
+the characteristics of a fan. It can also search for available fans 
+if you don't the MAC address.
 
 For more on using the tool, just run `calima -h`.
+
+Debugging
+-------------
+Set this to True in pycalima/Calima.py file if want to see more verbose output.
+
+  self._debug = False
 
 Documentation
 -------------

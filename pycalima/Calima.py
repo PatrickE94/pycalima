@@ -34,6 +34,7 @@ TrickleDays = namedtuple('TrickleDays', 'Weekdays Weekends')
 BoostMode = namedtuple('BoostMode', 'OnOff Speed Seconds')
 
 FanState = namedtuple('FanState', 'Humidity Temp Light RPM BoostActive Mode Unknown Unknown2')
+FanStateShort = namedtuple('FanState', 'Humidity Temp Light RPM BoostActive Mode')
 
 
 def FindCalimas():
@@ -45,7 +46,8 @@ def FindCalimas():
 class Calima:
 
     def __init__(self, addr, pin):
-        self._debug = True
+        # Set debug to true if you want more verbose output
+        self._debug = False
         self.conn = ble.Peripheral(deviceAddr=addr)
         self.setAuth(pin)
 
@@ -58,12 +60,25 @@ class Calima:
     def _bToStr(self, val):
         return binascii.b2a_hex(val).decode('utf-8')
 
+    def _readHandleShort(self, handle):
+        val = self.conn.readCharacteristic(handle)
+        if (self._debug):
+            print("%s" % (self._bToStr(val)))
+
+        return val
+
     def _readHandle(self, handle):
         val = self.conn.readCharacteristic(handle)
         if (self._debug):
             print("[Calima] [R] %s = %s" % (hex(handle), self._bToStr(val)))
 
         return val
+
+    def _writeHandleShort(self, handle, val):
+        if (self._debug):
+            print("%s" % (self._bToStr(val)))
+
+        self.conn.writeCharacteristic(handle, val, withResponse=True)
 
     def _writeHandle(self, handle, val):
         if (self._debug):
@@ -106,7 +121,7 @@ class Calima:
     # --- Onwards to PAX "unknown" characteristics
 
     def setAuth(self, pin):
-        self._writeHandle(0x18, pack("<I", int(pin)))
+        self._writeHandleShort(0x18, pack("<I", int(pin)))
 
     def setAlias(self, name):
         self._writeHandle(0x1c, pack('20s', bytearray(name, 'utf-8')))
@@ -114,8 +129,16 @@ class Calima:
     def getAlias(self):
         return self._readHandle(0x1c).decode('utf-8')
 
-    def getUnknown1f(self):
-        return self._bToStr(self._readHandle(0x1f))
+    def getIsClockSet(self):
+        return self._bToStr(self._readHandleShort(0x1f))
+
+    def getStateShort(self):
+        v = unpack('<4HBHB', self._readHandle(0x21))
+        boostMode = bool(v[4] & 0x10)
+        mode = v[4] >> 1
+        #return self._bToStr(self._readHandleShort(0x21))
+        # Among other things round temperature to 1 decimal point
+        return FanStateShort(v[0], round((v[1]/4),1), v[2], v[3], boostMode, mode)
 
     def getState(self):
         v = unpack('<4HBHB', self._readHandle(0x21))
@@ -145,7 +168,7 @@ class Calima:
     def setSensorsSensitivity(self, humidity, light):
         if humidity > 3 or humidity < 0:
             raise ValueError("Humidity sensitivity must be between 0-3")
-        if light > 3 or light < 2:
+        if light > 3 or light < 0:
             raise ValueError("Light sensitivity must be between 0-3")
 
         value = pack('<4B', bool(humidity), humidity, bool(light), light)
@@ -203,18 +226,18 @@ class Calima:
         self.setTime(now.isoweekday(), now.hour, now.minute, now.second)
 
     def setSilentHours(self, on, startingHours, startingMinutes, endingHours, endingMinutes):
-        if startingHour < 0 or startingHour > 23:
+        if startingHours < 0 or startingHours > 23:
             raise ValueError("Starting hour is an invalid number")
-        if endingHour < 0 or endingHours > 23:
+        if endingHours < 0 or endingHours > 23:
             raise ValueError("Ending hour is an invalid number")
-        if startingMinute < 0 or startingMinutes > 59:
+        if startingMinutes < 0 or startingMinutes > 59:
             raise ValueError("Starting minute is an invalid number")
-        if endingMinute < 0 or endingMinute > 59:
+        if endingMinutes < 0 or endingMinutes > 59:
             raise ValueError("Ending minute is an invalid number")
 
         value = pack('<5B', int(on),
-                     startingHour, startingMinute,
-                     endingHour, endingMinute)
+                     startingHours, startingMinutes,
+                     endingHours, endingMinutes)
         self._writeHandle(0x38, value)
 
     def getSilentHours(self):
