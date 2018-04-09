@@ -24,7 +24,7 @@ Formats are specified using keywords or
 | 0x0015 | Manufacturer       | "PAX"                               | String          | R   |
 | 0x0018 | Auth               | 01:02:03:04                         | BBBB            | W   |
 | 0x001c | Alias              | "My Vent"                           | 20 bytes String | R/W |
-| 0x001f | Unknown            | 00                                  | -               | R/W?|
+| 0x001f | IsClockSet         | 00 or 02                            | -               | R   |
 | 0x0021 | Status             | 00:00:5f:00:0b:00:81:06:02:00:00:00 | HHHHBHB         | R   |
 | 0x0024 | Unknown            | 01                                  | -               | R/W?|
 | 0x0026 | Unknown            | 00                                  | -               | R/W?|
@@ -48,6 +48,14 @@ The pincode is encoded as a single large number represented in Hex.
 ### Alias
 The App always transmits 20 bytes. If the string is less than 20 bytes,
 the rest is null padded.
+
+### IsCLockSet
+If Calima was power cycled the LED will become red on fron side which mean the internal clock is not set. This is reflected by this parameter.
+
+```
+  ClockIsSet:  00
+ClockIsNotSet: 02
+```
 
 ### Fan speed settings
 Fan speed is ranging from 0 to 2500 and measured in RPM.
@@ -158,7 +166,6 @@ The last two bytes are complete unknown for now.
 ### Unknown Characteristics
 Below are a few undecoded characteristics with their recorded values.
 ```
-0x001f = 00
 0x0024 = 01
 0x0026 = 00
 0x002e = 19:00:00:34:08

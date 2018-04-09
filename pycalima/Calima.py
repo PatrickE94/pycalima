@@ -34,6 +34,7 @@ TrickleDays = namedtuple('TrickleDays', 'Weekdays Weekends')
 BoostMode = namedtuple('BoostMode', 'OnOff Speed Seconds')
 
 FanState = namedtuple('FanState', 'Humidity Temp Light RPM BoostActive Mode Unknown Unknown2')
+FanStateShort = namedtuple('FanState', 'Humidity Temp Light RPM BoostActive Mode')
 
 
 def FindCalimas():
@@ -45,7 +46,8 @@ def FindCalimas():
 class Calima:
 
     def __init__(self, addr, pin):
-        self._debug = True
+        # Set debug to true if you want more verbose output
+        self._debug = False
         self.conn = ble.Peripheral(deviceAddr=addr)
         self.setAuth(pin)
 
@@ -69,14 +71,7 @@ class Calima:
         if (self._debug):
             print("[Calima] [W] %s = %s" % (uuid, self._bToStr(val)))
 
-        self.conn.getCharacteristics(uuid=uuid)[0].write(val)
-
-    def _readHandle(self, handle):
-        val = self.conn.readCharacteristic(handle)
-        if (self._debug):
-            print("[Calima] [R] %s = %s" % (hex(handle), self._bToStr(val)))
-
-        return val
+        self.conn.getCharacteristics(uuid=uuid)[0].write(val, withResponse=True)
 
     def scanCharacteristics(self):
         val = self.conn.getCharacteristics()
@@ -121,8 +116,16 @@ class Calima:
     def getAlias(self):
         return self._readUUID("b85fa07a-9382-4838-871c-81d045dcc2ff").decode('utf-8')
 
-    def getUnknown1f(self):
+    def getIsClockSet(self):
         return self._bToStr(self._readUUID("25a824ad-3021-4de9-9f2f-60cf8d17bded"))
+
+    def getStateShort(self):
+        v = unpack('<4HBHB', self._readUUID("528b80e8-c47a-4c0a-bdf1-916a7748f412"))
+        boostMode = bool(v[4] & 0x10)
+        mode = v[4] >> 1
+        #return self._bToStr(self._readHandleShort(0x21))
+        # Among other things round temperature to 1 decimal point
+        return FanStateShort(v[0], round((v[1]/4),1), v[2], v[3], boostMode, mode)
 
     def getState(self):
         v = unpack('<4HBHB', self._readUUID("528b80e8-c47a-4c0a-bdf1-916a7748f412"))
@@ -152,7 +155,7 @@ class Calima:
     def setSensorsSensitivity(self, humidity, light):
         if humidity > 3 or humidity < 0:
             raise ValueError("Humidity sensitivity must be between 0-3")
-        if light > 3 or light < 2:
+        if light > 3 or light < 0:
             raise ValueError("Light sensitivity must be between 0-3")
 
         value = pack('<4B', bool(humidity), humidity, bool(light), light)
@@ -210,18 +213,18 @@ class Calima:
         self.setTime(now.isoweekday(), now.hour, now.minute, now.second)
 
     def setSilentHours(self, on, startingHours, startingMinutes, endingHours, endingMinutes):
-        if startingHour < 0 or startingHour > 23:
+        if startingHours < 0 or startingHours > 23:
             raise ValueError("Starting hour is an invalid number")
-        if endingHour < 0 or endingHours > 23:
+        if endingHours < 0 or endingHours > 23:
             raise ValueError("Ending hour is an invalid number")
-        if startingMinute < 0 or startingMinutes > 59:
+        if startingMinutes < 0 or startingMinutes > 59:
             raise ValueError("Starting minute is an invalid number")
-        if endingMinute < 0 or endingMinute > 59:
+        if endingMinutes < 0 or endingMinutes > 59:
             raise ValueError("Ending minute is an invalid number")
 
         value = pack('<5B', int(on),
-                     startingHour, startingMinute,
-                     endingHour, endingMinute)
+                     startingHours, startingMinutes,
+                     endingHours, endingMinutes)
         self._writeUUID("b5836b55-57bd-433e-8480-46e4993c5ac0", value)
 
     def getSilentHours(self):
