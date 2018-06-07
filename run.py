@@ -22,9 +22,9 @@ from pycalima.Calima import Calima
 
 # Here you can specify your Calimas MAC address and pincode
 # Address you can find by using cmdline.poy script and -l parameter
-# Pincode is found on the backside of the manual or on one of the 
+# Pincode is found on the backside of the manual or on one of the
 # feet of the motor plug component
-fan = Calima("58:2b:db:00:7b:a2", "03155106")
+fan = Calima("de:ad:be:ef:fo:od", "12345678")
 appliedSettings = 0
 
 try:
@@ -32,7 +32,7 @@ try:
 #  print(fan.getState())
 
 
-  # If Clock is not set then there has been a power failure, 
+  # If Clock is not set then there has been a power failure,
   # so just in case we will write the settings to Calima and set time
   if fan.getIsClockSet() == "02":
     # Lets preconfigure Calima by setting these values
