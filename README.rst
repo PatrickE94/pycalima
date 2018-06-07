@@ -14,7 +14,7 @@ Uses `BluePy <https://github.com/IanHarvey/bluepy>`_
 
 Installation
 ----------
-I did this on Raspberry pi Zero W but it can be done on other hardware too.
+I did this on Raspberry Pi Zero W but it can be done on any computer which support BluePy (and has a bluetooth dongle).
 
 You will need to install python3 which is Python v 3.4 if you install it from apt-get repos.
    $apt install python3 python3-pip libglib2.0-dev
@@ -35,9 +35,9 @@ Demo usage
 
 Command line tool
 -----------------
-Pretty useful commnd line tool which among other things can print all
+Pretty useful command line tool which among other things can print all
 the characteristics of a fan. It can also search for available fans 
-if you don't the MAC address.
+if you don't know the MAC address.
 
 For more on using the tool, just run `calima -h`.
 

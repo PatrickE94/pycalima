@@ -24,7 +24,7 @@ Formats are specified using keywords or
 | 0x0015 | Manufacturer       | "PAX"                               | String          | R   |
 | 0x0018 | Auth               | 01:02:03:04                         | BBBB            | W   |
 | 0x001c | Alias              | "My Vent"                           | 20 bytes String | R/W |
-| 0x001f | IsClockSet         | 00 or 02                            | -               | R   |
+| 0x001f | Is Clock Set       | 00(true) or 02(false)               | -               | R   |
 | 0x0021 | Status             | 00:00:5f:00:0b:00:81:06:02:00:00:00 | HHHHBHB         | R   |
 | 0x0024 | Unknown            | 01                                  | -               | R/W?|
 | 0x0026 | Unknown            | 00                                  | -               | R/W?|
@@ -53,8 +53,8 @@ the rest is null padded.
 If Calima was power cycled the LED will become red on fron side which mean the internal clock is not set. This is reflected by this parameter.
 
 ```
-  ClockIsSet:  00
-ClockIsNotSet: 02
+    Clock is set: 00
+Clock is not set: 02
 ```
 
 ### Fan speed settings
@@ -96,7 +96,7 @@ On/Off|Speed|Runtime
     01:00:02:01:01
 ```
 
-The fan speed is the same as with Fan speed settings.  
+The fan speed is the same as with Fan speed settings.
 The runtime is measured in seconds, two byte numeric
 (e.g. `300 seconds => 012c => 2c:01`).
 
@@ -124,7 +124,7 @@ __TODO__: Is the day zero or one indexed?
           01:16:00:07:00
       On/Off |  |  |  Ending minutes
 Starting hours  |  Ending hours
- Starting minutes  
+ Starting minutes
 ```
 
 Example above is On from 22:00 to 07:00.
