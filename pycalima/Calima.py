@@ -67,6 +67,12 @@ class Calima:
 
         return val
 
+    def _readHandle(self, handle):
+        val = self.conn.readCharacteristic(handle)
+        if (self._debug):
+            print("[Calima] [R] %s = %s" % (hex(handle), self._bToStr(val)))
+        return val
+
     def _writeUUID(self, uuid, val):
         if (self._debug):
             print("[Calima] [W] %s = %s" % (uuid, self._bToStr(val)))
