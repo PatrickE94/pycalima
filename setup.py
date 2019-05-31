@@ -24,7 +24,7 @@ def readme():
         return f.read()
 
 setup(name='Calima',
-      version='1.0.1',
+      version='1.1.0',
       description='Python interface for Pax Calima Fan',
       long_description=readme(),
       keywords='pax calima fan bluetooth ble',
