@@ -34,7 +34,7 @@ SilentHours = namedtuple('SilentHours', 'On StartingHour StartingMinute EndingHo
 TrickleDays = namedtuple('TrickleDays', 'Weekdays Weekends')
 BoostMode = namedtuple('BoostMode', 'OnOff Speed Seconds')
 
-FanState = namedtuple('FanState', 'Humidity Temp Light RPM Trigger Tbd')
+FanState = namedtuple('FanState', 'Humidity Temp Light RPM Mode')
 
 # Stolen defines for each characteristic (taken from a decompiled Android App)
 CHARACTERISTIC_APPEARANCE = "00002a01-0000-1000-8000-00805f9b34fb"
@@ -156,9 +156,9 @@ class Calima:
         return self._bToStr(self._readUUID(CHARACTERISTIC_STATUS))
 
     def getState(self):
-        # Short Short Short Short    byte           byte
-        # Hum   Temp  Light FanSpeed CurrentTrigger Tbd
-        v = unpack('<4HBB', self._readUUID(CHARACTERISTIC_SENSOR_DATA))
+        # Short Short Short Short    Byte Short Byte
+        # Hum   Temp  Light FanSpeed Mode Tbd   Tbd
+        v = unpack('<4HBHB', self._readUUID(CHARACTERISTIC_SENSOR_DATA))
         trigger = "No trigger"
         if ((v[4] >> 4) & 1) == 1:
             trigger = "Boost"
@@ -168,7 +168,7 @@ class Calima:
             trigger = "Light ventilation"
         elif (v[4] & 3) == 3: # Note that the trigger might be active, but mode must be enabled to be activated
             trigger = "Humidity ventilation"
-        return FanState(v[0], v[1]/4, v[2], v[3], trigger, v[5])
+        return FanState(v[0], v[1]/4, v[2], v[3], trigger)
 
     def getFactorySettingsChanged(self):
         return bool(unpack('<I', self._readUUID(CHARACTERISTIC_FACTORY_SETTINGS_CHANGED)))
