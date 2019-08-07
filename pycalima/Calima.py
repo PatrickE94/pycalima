@@ -171,10 +171,10 @@ class Calima:
         return FanState(v[0], v[1]/4, v[2], v[3], trigger)
 
     def getFactorySettingsChanged(self):
-        return bool(unpack('<I', self._readUUID(CHARACTERISTIC_FACTORY_SETTINGS_CHANGED)))
+        return unpack('<?', self._readUUID(CHARACTERISTIC_FACTORY_SETTINGS_CHANGED))
 
     def getMode(self):
-        v = unpack('<H', self._readUUID(CHARACTERISTIC_MODE))
+        v = unpack('<B', self._readUUID(CHARACTERISTIC_MODE))
         if v == 0:
             return "MultiMode"
         elif v == 1:
