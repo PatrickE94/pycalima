@@ -24,11 +24,11 @@ def readme():
         return f.read()
 
 setup(name='Calima',
-      version='1.1.0',
+      version='2.0.0',
       description='Python interface for Pax Calima Fan',
       long_description=readme(),
       keywords='pax calima fan bluetooth ble',
-      author='Patrick Engström',
+      author='Patrick Wadström',
       author_email='patrick@weblab.se',
       url='https://github.com/patricke94/pycalima',
       license='Apache 2.0',
