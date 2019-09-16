@@ -12,32 +12,36 @@ Protocol is little-endian.
 Formats are specified using keywords or
 [struct format characters](https://docs.python.org/2/library/struct.html#format-characters).
 
-| Handle | Name               | Example Value                       | Format          | R/W |
-|--------|--------------------|-------------------------------------|-----------------|-----|
-| 0x0003 | Device Name        | "Calima"                            | String          | R   |
-| 0x0003 | Appearance         | 0 (Generic)                         | Numeric         | R   |
-| 0x000d | Model number       | "10"                                | String          | R   |
-| 0x000b | Serial number      | "000000"                            | String          | R   |
-| 0x000f | Hardware revision  | "01.00"                             | String          | R   |
-| 0x0011 | Firmware revision  | "01.01"                             | String          | R   |
-| 0x0013 | Software revision  | "01.04"                             | String          | R   |
-| 0x0015 | Manufacturer       | "PAX"                               | String          | R   |
-| 0x0018 | Auth               | 01:02:03:04                         | BBBB            | W   |
-| 0x001c | Alias              | "My Vent"                           | 20 bytes String | R/W |
-| 0x001f | Is Clock Set       | 00(true) or 02(false)               | -               | R   |
-| 0x0021 | Status             | 00:00:5f:00:0b:00:81:06:02:00:00:00 | HHHHBHB         | R   |
-| 0x0024 | Unknown            | 01                                  | -               | R/W?|
-| 0x0026 | Unknown            | 00                                  | -               | R/W?|
-| 0x0028 | Fan speed          | 01:00:02:00:03:00                   | HHH             | R/W |
-| 0x002a | Sensors            | 01:03:01:03                         | BBBB            | R/W |
-| 0x002c | Light sensor       | 01:02                               | BB              | R/W |
-| 0x002e | Unknown            | 19:00:00:34:08                      | -               | R/W?|
-| 0x0030 | Manual fan control | 01:02:03:02:03                      | BHH             | R/W |
-| 0x0032 | Unknown            | 00:00                               | -               | R/W?|
-| 0x0034 | Automatic Cycles   | 00                                  | B               | R/W |
-| 0x0036 | Time               | 01:02:03:04                         | BBBB            | R/W |
-| 0x0038 | Silent hours       | 01:02:03:04:05                      | BBBBB           | R/W |
-| 0x003a | Trickle settings   | 01:00                               | BB              | R/W |
+| Name               | Example Value                       | Format          | R/W |
+|--------------------|-------------------------------------|-----------------|-----|
+| Device Name        | "Calima"                            | String          | R   |
+| Appearance         | 0 (Generic)                         | Numeric         | R   |
+| Model number       | "10"                                | String          | R   |
+| Serial number      | "000000"                            | String          | R   |
+| Hardware revision  | "01.00"                             | String          | R   |
+| Firmware revision  | "01.01"                             | String          | R   |
+| Software revision  | "01.04"                             | String          | R   |
+| Manufacturer       | "PAX"                               | String          | R   |
+| Auth               | 01:02:03:04                         | BBBB            | W   |
+| Alias              | "My Vent"                           | 20 bytes String | R/W |
+| Is Clock Set       | 00(true) or 02(false)               | B               | R   |
+| Status             | 00:00:5f:00:0b:00:81:06:02:00:00:00 | HHHHBHB         | R   |
+| Settings changed   | 01                                  | ?               | R   |
+| Mode               | 00                                  | B               | R/W |
+| Fan speed          | 01:00:02:00:03:00                   | HHH             | R/W |
+| Sensors            | 01:03:01:03                         | BBBB            | R/W |
+| Light sensor       | 01:02                               | BB              | R/W |
+| Heat Distributor   | 19:00:00:34:08                      | BHH             | R/W |
+| Manual fan control | 01:02:03:02:03                      | BHH             | R/W |
+| Led                | 00                                  | B               | R/W |
+| Automatic Cycles   | 00                                  | B               | R/W |
+| Time               | 01:02:03:04                         | BBBB            | R/W |
+| Silent hours       | 01:02:03:04:05                      | BBBBB           | R/W |
+| Trickle settings   | 01:00                               | BB              | R/W |
+| Reset              | 00:00                               | I               | W   |
+
+Note: Handles are now omitted since we are using UUID's. These are too long to write out in
+the table. Check the code!
 
 ### Auth
 The pincode is encoded as a single large number represented in Hex.
@@ -141,36 +145,12 @@ Current values and state.
 
 ```
   00:00:5f:00:0b:00:81:06:02:00:00:00
-Humidity |    Light |     |     |  
-    Temp |          |     |     Unknown
-             Fanspeed     Unknown mode short
+Humidity |    Light |     |  Unknown
+    Temp |          |     |
+             Fanspeed     Mode
 ```
 Unsure about the temperature field, but it seems about right.  
 Fan speed is measured as always in RPM.
-
-#### Unknown mode short
-```
-01:00 When light(no), given mode (trickle), sensors(on)
-01:00 when light(no), given mode (trickle), sensors(off)
-11:00 When light(no), given mode (BOOST), sensors(off)
-12:00 When light(yes), given mode (Booost), sensors(on)
-43:0b When light(yes), given mode (humidity), sensors(on)
-63:08 randomly in trickle mode a while after shower has been used
-02:00 When light(no), given mode (silent), sensors(on), silent(on)
-02:00 When light(no?), given mode (light), sensors(on), silent(off)
-```
-Representation sticks better with current mode/sensor values than set mode and values.
-
-The last two bytes are complete unknown for now.
-
-### Unknown Characteristics
-Below are a few undecoded characteristics with their recorded values.
-```
-0x0024 = 01
-0x0026 = 00
-0x002e = 19:00:00:34:08
-0x0032 = 00:00
-```
 
 ## Normal App connection flow
 1.  0x0018 (Auth) and 0x0036 (Set time) are sent.
