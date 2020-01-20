@@ -169,7 +169,7 @@ class Calima:
             trigger = "Light ventilation"
         elif (v[4] & 3) == 3: # Note that the trigger might be active, but mode must be enabled to be activated
             trigger = "Humidity ventilation"
-        return FanState(round(math.log2(v[0])*10, 2), v[1]/4, v[2], v[3], trigger)
+        return FanState(round(math.log2(v[0])*10, 2) if v[0] > 0 else 0, v[1]/4, v[2], v[3], trigger)
 
     def getFactorySettingsChanged(self):
         return unpack('<?', self._readUUID(CHARACTERISTIC_FACTORY_SETTINGS_CHANGED))
